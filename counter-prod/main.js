@@ -223,7 +223,7 @@ function addCounter() {
     localStorage.setItem("divs", JSON.stringify(divs))
 }
 
-function counterDiv(year, month, day, hour, syear, smonth, sday, shour, desccounter) {
+function counterDiv(year, month, day, hour, syear, smonth, sday, shour, desc) {
     this.year = year;
     this.month = month;
     this.day = day;
@@ -232,7 +232,7 @@ function counterDiv(year, month, day, hour, syear, smonth, sday, shour, desccoun
     this.smonth = smonth;
     this.sday = sday;
     this.shour = shour;
-    this.desccounter = desccounter;
+    this.desc = desc;
 }
 
 function val(id) {
