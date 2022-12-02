@@ -42,7 +42,7 @@ function Config(fixedPercentage, updateMs, fixedSeconds, fontPX) {
 let animated = false;
 
 /** main thread to perform updatse. MONTH STARTS WITH 0-11 */
-async function update(divName, year, month, day, hour, startYear, startMonth, startDay, startHour, desc) {
+async function update(divName, year, month, day, hour, startYear, startMonth, startDay, startHour, desc, Sminutes, minutes2) {
     let langPack = langPacks[lang]
     langLocaleString = "en"
     document.title = langPack["html.title"]
@@ -50,13 +50,13 @@ async function update(divName, year, month, day, hour, startYear, startMonth, st
     document.getElementById(divName).style.fontSize = CFG.fontPX;
 
     let currentDate = new Date();
-    let dateEnd = new Date(year, month, day, hour)
+    let dateEnd = new Date(year, month, day, hour, minutes2)
     let diff = dateEnd.getTime() - currentDate.getTime()
 
 
     let percentage = "startYear not specified"
     if (startYear != null) {
-        percentage = percentageBetweenNumbers(new Date(startYear, startMonth, startDay, startHour).getTime(), currentDate.getTime(), dateEnd.getTime()).toFixed(CFG.fixedPercentage) + " %";
+        percentage = percentageBetweenNumbers(new Date(startYear, startMonth, startDay, startHour, Sminutes).getTime(), currentDate.getTime(), dateEnd.getTime()).toFixed(CFG.fixedPercentage) + " %";
     }
 
 
@@ -136,7 +136,7 @@ async function update(divName, year, month, day, hour, startYear, startMonth, st
     }
 
 
-    setTimeout(function () { update(divName, year, month, day, hour, startYear, startMonth, startDay, startHour, desc) }, CFG.updateMs);
+    setTimeout(function () { update(divName, year, month, day, hour, startYear, startMonth, startDay, startHour, desc, Sminutes, minutes2) }, CFG.updateMs);
 }
 
 function percentageBetweenNumbers(start, curr, end) {
@@ -195,7 +195,14 @@ function loadDivs() {
         div.id = (Math.random() * 100000) + "_divCounter"
         document.getElementById("moreDivs").after(div);
 
-        update(div.id, element.year, element.month, element.day, element.hour, element.syear, element.smonth, element.sday, element.shour, element.desc)
+        let Sminutes = 0;
+        let minutes = 0;
+        if(element.Sminutes !== undefined){
+            Sminutes = element.Sminutes;
+            minutes = element.minutes;
+        }
+
+        update(div.id, element.year, element.month, element.day, element.hour, element.syear, element.smonth, element.sday, element.shour, element.desc, Sminutes, minutes)
     }
 }
 
@@ -218,12 +225,12 @@ function addCounter() {
     div.id = (Math.random() * 100000) + "_divCounter"
     document.getElementById("moreDivs").after(div);
 
-    update(div.id, val("year"), val('month'), val('day'), val('hour'), val("Syear"), val('Smonth'), val('Sday'), val('Shour'), val("desccounter"))
-    divs.push(new counterDiv(val("year"), val('month'), val('day'), val('hour'), val("Syear"), val('Smonth'), val('Sday'), val('Shour'), val("desccounter")))
+    update(div.id, val("year"), val('month'), val('day'), val('hour'), val("Syear"), val('Smonth'), val('Sday'), val('Shour'), val("desccounter"), val("Sminutes"), val("minutes"))
+    divs.push(new counterDiv(val("year"), val('month'), val('day'), val('hour'), val("Syear"), val('Smonth'), val('Sday'), val('Shour'), val("desccounter"), val("Sminutes"), val("minutes")))
     localStorage.setItem("divs", JSON.stringify(divs))
 }
 
-function counterDiv(year, month, day, hour, syear, smonth, sday, shour, desc) {
+function counterDiv(year, month, day, hour, syear, smonth, sday, shour, desc, Sminutes, minutes) {
     this.year = year;
     this.month = month;
     this.day = day;
@@ -233,6 +240,8 @@ function counterDiv(year, month, day, hour, syear, smonth, sday, shour, desc) {
     this.sday = sday;
     this.shour = shour;
     this.desc = desc;
+    this.Sminutes = Sminutes;
+    this.minutes = minutes;
 }
 
 function val(id) {
