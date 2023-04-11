@@ -7,6 +7,7 @@ langPacks["en"] = JSON.parse("{\"counter.countTo\":\"counting to\",\"counter.wee
 let CFG = null;
 let lang = "en"
 let langLocaleString = "en"
+const divMainClassName = "mainFont divMain";
 
 
 function defaultConfig() {
@@ -129,9 +130,23 @@ async function update(divName, year, month, day, hour, startYear, startMonth, st
     
     if(seconds < 0){
         if(currentDate.getMonth() == 5 && currentDate.getDate() == 24){
-            document.getElementById(divName).innerHTML = langPack["counter.finishedVacations"]
+            document.getElementById(divName).innerHTML = document.getElementById(divName).innerHTML = `<div style="position: relative; width: 0; height: 0">
+                <div style="position: absolute; left: 30px; top: 0px;" class="removableReversed">
+                    REMOVE
+                </div>
+            </div>
+            `+langPack["counter.finishedVacations"]
+            document.getElementById(divName).className = divMainClassName+" removableDivMain";
+            document.getElementById(divName).onclick = function() {removeDivByDesc(desc)};
         }else{
-            document.getElementById(divName).innerHTML = langPack["counter.finished"]
+            document.getElementById(divName).innerHTML = `<div style="position: relative; width: 0; height: 0">
+                <div style="position: absolute; left: 30px; top: 0px;" class="removableReversed">
+                    REMOVE
+                </div>
+            </div>
+            `+langPack["counter.finished"]
+            document.getElementById(divName).className = divMainClassName+" removableDivMain";
+            document.getElementById(divName).onclick = function() {removeDivByDesc(desc)};
         }
     }
 
@@ -195,14 +210,7 @@ function loadDivs() {
         div.id = (Math.random() * 100000) + "_divCounter"
         document.getElementById("moreDivs").after(div);
 
-        let Sminutes = 0;
-        let minutes = 0;
-        if(element.Sminutes !== undefined){
-            Sminutes = element.Sminutes;
-            minutes = element.minutes;
-        }
-
-        update(div.id, element.year, element.month, element.day, element.hour, element.syear, element.smonth, element.sday, element.shour, element.desc, Sminutes, minutes)
+        update(div.id, element.year, element.month, element.day, element.hour, element.syear, element.smonth, element.sday, element.shour, element.desccounter, Sminutes, minutes)
     }
 }
 
@@ -220,14 +228,26 @@ function loadConfig() {
 var divs = []
 
 function addCounter() {
-    let div = document.createElement("div");
-    div.className = "mainFont divMain"
-    div.id = (Math.random() * 100000) + "_divCounter"
-    document.getElementById("moreDivs").after(div);
+    // let div = document.createElement("div");
+    // div.className = "mainFont divMain"
+    // div.id = (Math.random() * 1000000) + "_divCounter"
+    // document.getElementById("moreDivs").after(div);
 
-    update(div.id, val("year"), val('month'), val('day'), val('hour'), val("Syear"), val('Smonth'), val('Sday'), val('Shour'), val("desccounter"), val("Sminutes"), val("minutes"))
-    divs.push(new counterDiv(val("year"), val('month'), val('day'), val('hour'), val("Syear"), val('Smonth'), val('Sday'), val('Shour'), val("desccounter"), val("Sminutes"), val("minutes")))
-    localStorage.setItem("divs", JSON.stringify(divs))
+
+    // update(div.id, val("year"), val('month'), val('day'), val('hour'), val("Syear"), val('Smonth'), val('Sday'), val('Shour'), val("desccounter"), val("Sminutes"), val("minutes"))
+    // divs.push(new counterDiv(val("year"), val('month'), val('day'), val('hour'), val("Syear"), val('Smonth'), val('Sday'), val('Shour'), val("desccounter"), val("Sminutes"), val("minutes")))
+    // localStorage.setItem("divs", JSON.stringify(divs))
+
+    // update(div.id, val("year"), val('month'), val('day'), val('hour'), val("Syear"), val('Smonth'), val('Sday'), val('Shour'), val("desccounter"))
+    // divs.push(new counterDiv(val("year"), val('month'), val('day'), val('hour'), val("Syear"), val('Smonth'), val('Sday'), val('Shour'), val("desccounter")))
+    // localStorage.setItem("divs", JSON.stringify(divs))\
+    internal_addCounter(val("year"), val('month'), val('day'), val('hour'), val("Syear"), val('Smonth'), val('Sday'), val('Shour'), val("desccounter"), val("Sminutes"), val("minutes"))
+}
+
+
+function getCounterAsLink(){
+    const baseURL = location.protocol + '//' + location.host + location.pathname;
+    alert(baseURL+`?action=add&year=${val("year")}&month=${val("month")}&day=${val("day")}&hour=${val("hour")}&Syear=${val("Syear")}&Smonth=${val("Smonth")}&Shour=${val("Shour")}&desccounter=${encodeURIComponent(val("desccounter"))}`) 
 }
 
 function counterDiv(year, month, day, hour, syear, smonth, sday, shour, desc, Sminutes, minutes) {
@@ -239,11 +259,63 @@ function counterDiv(year, month, day, hour, syear, smonth, sday, shour, desc, Sm
     this.smonth = smonth;
     this.sday = sday;
     this.shour = shour;
-    this.desc = desc;
+    this.desccounter = desccounter;
     this.Sminutes = Sminutes;
     this.minutes = minutes;
 }
 
 function val(id) {
     return document.getElementById(id).value;
+}
+
+
+function onLoadFinish(){
+    // read args and check if we have "action"
+    //https://www.sitepoint.com/get-url-parameters-with-javascript/
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    if(urlParams.has("action")){
+        parseArgument(urlParams);
+    }
+}
+
+function parseArgument(urlParams){
+    const action = urlParams.get("action");
+    if(action == "add"){
+        parseAddArguments(urlParams);
+    }
+}
+
+function parseAddArguments(urlParams){
+    internal_addCounter(urlParams.get("year"), urlParams.get("month"), urlParams.get("day"), urlParams.get("hour"), urlParams.get("Syear"), urlParams.get("Smonth"), urlParams.get("Sday"), urlParams.get("Shour"), decodeURI(urlParams.get("desccounter")))
+}
+
+function internal_addCounter(year, month, day, hour, Syear, Smonth, Sday, Shour, desccounter, Sminutes, minutes){
+
+    //anti-duplicate
+    for(const element of divs){
+        if(element.desccounter == desccounter){
+            return;
+        }
+    }
+
+    let div = document.createElement("div");
+    div.className = divMainClassName;
+    div.id = (Math.random() * 1000000) + "_divCounter"
+    document.getElementById("moreDivs").after(div);
+
+    update(div.id, year, month, day, hour, Syear, Smonth, Sday, Shour, desccounter, Sminutes, minutes)
+    divs.push(new counterDiv(year, month, day, hour, Syear, Smonth, Sday, Shour, desccounter, Sminutes, minutes))
+    localStorage.setItem("divs", JSON.stringify(divs))
+}
+
+function removeDivByDesc(desccounter){
+    for(const element of divs){
+        if(element.desccounter == desccounter){
+            const index = divs.indexOf(element);
+            divs.splice(index, 1);
+            localStorage.setItem("divs", JSON.stringify(divs))
+            location.reload();
+        }
+    }
 }

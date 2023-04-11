@@ -13,9 +13,12 @@
     <script src="party.js"></script>
 
     <style>
+        :root{
+            --mainFontColor: rgba(255, 255, 255, 0.582);
+        }
         .mainFont {
             font-size: 14px;
-            color: rgba(255, 255, 255, 0.582);
+            color: var(--mainFontColor);
             font-family: "Maven Pro", Arial, Helvetica, sans-serif;
         }
 
@@ -26,6 +29,7 @@
             box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
             background-color: #ffffff0c;
             display: inline-block;
+            vertical-align: top;
         }
 
         @font-face {
@@ -39,6 +43,21 @@
 
         .text {
             width: 200px;
+        }
+        .removableDivMain {
+            transition: 0.3s;
+        }
+        .removableDivMain:hover {
+            background-color: black;
+            color: black;
+        }
+        .removableReversed {
+            transition: 0.3s;
+            opacity: 1;
+            color: var(--mainFontColor);
+        }
+        .removableDivMain:not(:hover) .removableReversed{
+            opacity: 0;
         }
     </style>
 </head>
@@ -107,7 +126,8 @@
             <input type="text" class="buttonbetter text" placeholder="minutes" id="Sminutes"><br>
             <br>
             <input type="text" class="buttonbetter text" placeholder="description" id="desccounter">
-            <input type="button" class="buttonbetter" onclick="clearDivs(); document.location.reload()" value="reset">
+            <input type="button" class="buttonbetter" onclick="clearDivs(); document.location.reload()" value="reset all counters">
+            <input type="button" class="buttonbetter" onclick="getCounterAsLink()" value="get counter as link">
             <br><br>
 
             <input type="button" class="buttonbetter"
@@ -124,6 +144,7 @@
         loadDivs()
         loadLangPreffered()
         //update("divMainVacation", "2022", "05", "24", "0", "2021", "8", "1", "0")
+        onLoadFinish();
     </script>
 </body>
 
