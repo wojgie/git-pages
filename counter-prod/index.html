@@ -123,9 +123,12 @@
                 id="Smonth"><br>
             <input type="text" class="buttonbetter text" placeholder="startDay" id="Sday"><br>
             <input type="text" class="buttonbetter text" placeholder="startHour" id="Shour"><br>
-            <input type="text" class="buttonbetter text" placeholder="minutes" id="Sminutes"><br>
+            <input type="text" class="buttonbetter text" placeholder="startMinutes" id="Sminutes"><br>
             <br>
             <input type="text" class="buttonbetter text" placeholder="description" id="desccounter">
+            <input type="button" class="buttonbetter"
+                onclick="document.getElementById('mainCFG2').style.display = 'none'; document.getElementById('buttonCFG2').style.display = '';addCounter()"
+                value="add">
             <input type="button" class="buttonbetter" onclick="clearDivs(); document.location.reload()" value="reset all counters">
             <input type="button" class="buttonbetter" onclick="getCounterAsLink()" value="get counter as link">
             <br><br>

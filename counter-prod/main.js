@@ -210,7 +210,7 @@ function loadDivs() {
         div.id = (Math.random() * 100000) + "_divCounter"
         document.getElementById("moreDivs").after(div);
 
-        update(div.id, element.year, element.month, element.day, element.hour, element.syear, element.smonth, element.sday, element.shour, element.desccounter, Sminutes, minutes)
+        update(div.id, element.year, element.month, element.day, element.hour, element.syear, element.smonth, element.sday, element.shour, element.desccounter, element.Sminutes, element.minutes)
     }
 }
 
@@ -247,10 +247,10 @@ function addCounter() {
 
 function getCounterAsLink(){
     const baseURL = location.protocol + '//' + location.host + location.pathname;
-    alert(baseURL+`?action=add&year=${val("year")}&month=${val("month")}&day=${val("day")}&hour=${val("hour")}&Syear=${val("Syear")}&Smonth=${val("Smonth")}&Shour=${val("Shour")}&desccounter=${encodeURIComponent(val("desccounter"))}&Sminutes=${val("Sminutes")}&minutes=${val("minutes")}`) 
+    alert(baseURL+`?action=add&year=${val("year")}&month=${val("month")}&day=${val("day")}&hour=${val("hour")}&Syear=${val("Syear")}&Smonth=${val("Smonth")}&Sday=${val("Sday")}&Shour=${val("Shour")}&desccounter=${encodeURIComponent(val("desccounter"))}&Sminutes=${val("Sminutes")}&minutes=${val("minutes")}`) 
 }
 
-function counterDiv(year, month, day, hour, syear, smonth, sday, shour, desc, Sminutes, minutes) {
+function counterDiv(year, month, day, hour, syear, smonth, sday, shour, desccounter, Sminutes, minutes) {
     this.year = year;
     this.month = month;
     this.day = day;
@@ -287,11 +287,12 @@ function parseArgument(urlParams){
 }
 
 function parseAddArguments(urlParams){
-    internal_addCounter(urlParams.get("year"), urlParams.get("month"), urlParams.get("day"), urlParams.get("hour"), urlParams.get("Syear"), urlParams.get("Smonth"), urlParams.get("Sday"), urlParams.get("Shour"), decodeURI(urlParams.get("desccounter"), urlParams.get("Sminutes"), urlParams.get("minutes")))
+    console.log (urlParams.get("year"), urlParams.get("month"), urlParams.get("day"), urlParams.get("hour"), urlParams.get("Syear"), urlParams.get("Smonth"), urlParams.get("Sday"), urlParams.get("Shour"), decodeURI(urlParams.get("desccounter")), urlParams.get("Sminutes"), urlParams.get("minutes"))
+    internal_addCounter(urlParams.get("year"), urlParams.get("month"), urlParams.get("day"), urlParams.get("hour"), urlParams.get("Syear"), urlParams.get("Smonth"), urlParams.get("Sday"), urlParams.get("Shour"), decodeURI(urlParams.get("desccounter")), urlParams.get("Sminutes"), urlParams.get("minutes"))
 }
 
 function internal_addCounter(year, month, day, hour, Syear, Smonth, Sday, Shour, desccounter, Sminutes, minutes){
-
+    console.log(desccounter)
     //anti-duplicate
     for(const element of divs){
         if(element.desccounter == desccounter){
