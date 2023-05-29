@@ -308,7 +308,7 @@ function loadCountersFromCode(counters, type){
     const countersDecoded = atob(counters.split("-")[3]);
     localStorage.setItem("divs", countersDecoded)
     alert(type == "full" ? "loaded! (counters + config)" : "loaded! (counters)")
-    location.href = "/"
+    location.href = location.pathname
 }
 
 function getCounterAsLink(){
