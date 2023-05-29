@@ -8,20 +8,29 @@ let CFG = null;
 let lang = "en"
 let langLocaleString = "en"
 const divMainClassName = "mainFont divMain";
+const scriptVersion = "v1.14";
+let buttonsToHideInMinMode = ["buttonCFG", "buttonCFG2"]
 
 
 function defaultConfig() {
-    CFG = new Config(3, 1000, 0, "14px");
+    CFG = new Config(3, 1000, 0, "14px", false);
 }
 
 defaultConfig()
+
+function setConfigPlaceholder(){
+    set("pP", CFG.fixedPercentage)
+    set("uM", CFG.updateMs)
+    set("pS", CFG.fixedSeconds)
+    set("fontPX", CFG.fontPX)
+}
 
 function updateConfig(config) {
     CFG = config;
     localStorage.setItem("config", JSON.stringify(config))
 }
 
-function Config(fixedPercentage, updateMs, fixedSeconds, fontPX) {
+function Config(fixedPercentage, updateMs, fixedSeconds, fontPX, minimalMode) {
     if (fixedPercentage == "") {
         fixedPercentage = 3;
     }
@@ -34,20 +43,23 @@ function Config(fixedPercentage, updateMs, fixedSeconds, fontPX) {
     if (fontPX == "") {
         fontPX = "14px"
     }
+    if(minimalMode == "" || minimalMode == undefined){
+        minimalMode = false;
+    }
     this.fontPX = fontPX;
     this.fixedPercentage = fixedPercentage;
     this.updateMs = updateMs;
     this.fixedSeconds = fixedSeconds;
+    this.minimalMode = minimalMode;
 }
 
 let animated = false;
+let langPack = langPacks[lang]
 
-/** main thread to perform updatse. MONTH STARTS WITH 0-11 */
+/** main thread to perform updates. MONTH STARTS WITH 0-11 */
 async function update(divName, year, month, day, hour, startYear, startMonth, startDay, startHour, desc, Sminutes, minutes2) {
-    let langPack = langPacks[lang]
+    langPack = langPacks[lang];
     langLocaleString = "en"
-    document.title = langPack["html.title"]
-    document.getElementById("header").innerHTML = langPack["html.header"]
     document.getElementById(divName).style.fontSize = CFG.fontPX;
 
     let currentDate = new Date();
@@ -58,6 +70,20 @@ async function update(divName, year, month, day, hour, startYear, startMonth, st
     let percentage = "startYear not specified"
     if (startYear != null) {
         percentage = percentageBetweenNumbers(new Date(startYear, startMonth, startDay, startHour, Sminutes).getTime(), currentDate.getTime(), dateEnd.getTime()).toFixed(CFG.fixedPercentage) + " %";
+    }
+
+    if(CFG.minimalMode){
+        document.getElementById("header").style.display = "none";
+        document.getElementById("headerBR").style.display = "none";
+        for(const idButton of buttonsToHideInMinMode){
+            document.getElementById(idButton).style.opacity = "0";
+        }
+    }else{
+        document.getElementById("header").style.display = "";
+        document.getElementById("headerBR").style.display = "";
+        for(const idButton of buttonsToHideInMinMode){
+            document.getElementById(idButton).style.opacity = "1";
+        }
     }
 
 
@@ -244,9 +270,48 @@ function addCounter() {
     internal_addCounter(val("year"), val('month'), val('day'), val('hour'), val("Syear"), val('Smonth'), val('Sday'), val('Shour'), val("desccounter"), val("Sminutes"), val("minutes"))
 }
 
+function toggleMinMode(){
+    if(CFG.minimalMode == false){
+        alert("enabling minimal mode hides config buttons. including the one you clicked to expand this menu. to disable minimal mode just click in the bottom left corner.")
+    }
+    CFG.minimalMode = !CFG.minimalMode;
+    localStorage.setItem("config", JSON.stringify(CFG))
+}
+
+const baseURL = location.protocol + '//' + location.host + location.pathname;
+let getAllCountersButton = null, getAllCountersButtonOnly = null, getAllCountersText = null;
+
+function onAddCounterMenuClosed(){
+    getAllCountersButton.style.display = "";
+    getAllCountersButtonOnly.style.display = "";
+    getAllCountersText.style.display = "none";
+}
+
+function getCountersAsCode(type){
+    let mainConfig = "";
+    if(type == "full"){
+        mainConfig = `-${btoa(localStorage.getItem("config"))}`
+    }
+    const countersEncoded = `${baseURL}?action=set&type=${type}&code=COUNTER@GITHUB-WOJGIE-${scriptVersion}-${btoa(localStorage.getItem("divs"))}${mainConfig}`
+    getAllCountersText.style.display = "";
+    getAllCountersButton.style.display = "none";
+    getAllCountersButtonOnly.style.display = "none";
+    getAllCountersText.value = countersEncoded;
+    alert(countersEncoded)
+}
+
+function loadCountersFromCode(counters, type){
+    if(type == "full"){
+        const cfgDecoded = atob(counters.split("-")[4])
+        localStorage.setItem("config", cfgDecoded)
+    }
+    const countersDecoded = atob(counters.split("-")[3]);
+    localStorage.setItem("divs", countersDecoded)
+    alert(type == "full" ? "loaded! (counters + config)" : "loaded! (counters)")
+    location.href = "/"
+}
 
 function getCounterAsLink(){
-    const baseURL = location.protocol + '//' + location.host + location.pathname;
     alert(baseURL+`?action=add&year=${val("year")}&month=${val("month")}&day=${val("day")}&hour=${val("hour")}&Syear=${val("Syear")}&Smonth=${val("Smonth")}&Sday=${val("Sday")}&Shour=${val("Shour")}&desccounter=${encodeURIComponent(val("desccounter"))}&Sminutes=${val("Sminutes")}&minutes=${val("minutes")}`) 
 }
 
@@ -268,6 +333,9 @@ function val(id) {
     return document.getElementById(id).value;
 }
 
+function set(id, val) {
+    document.getElementById(id).value = val;
+}
 
 function onLoadFinish(){
     // read args and check if we have "action"
@@ -277,12 +345,21 @@ function onLoadFinish(){
     if(urlParams.has("action")){
         parseArgument(urlParams);
     }
+    getAllCountersButton = document.getElementById("getAllCountersAsCode-button");
+    getAllCountersButtonOnly = document.getElementById("getAllCountersAsCode-button-only");
+    getAllCountersText = document.getElementById("getAllCountersAsCode-text");
+
+    document.title = langPack["html.title"]
+    document.getElementById("header").innerHTML = langPack["html.header"]
 }
 
 function parseArgument(urlParams){
     const action = urlParams.get("action");
     if(action == "add"){
         parseAddArguments(urlParams);
+    }
+    if(action == "set"){
+        loadCountersFromCode(urlParams.get("code"), urlParams.get("type"))
     }
 }
 

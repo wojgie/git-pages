@@ -64,7 +64,7 @@
 
 <body class="body">
     <h1 class="h1" id="header">Counter</h1>
-    <br>
+    <br id="headerBR">
     <!-- <div id="divMainVacation" class="mainFont divMain">
         
     </div> -->
@@ -75,6 +75,8 @@
         <input type="button" id="buttonCFG" class="buttonbetter" value="config"
             onclick="document.getElementById('mainCFG').style.display = ''; document.getElementById('buttonCFG').style.display = 'none'">
         <div id="mainCFG" style="display: none;">
+
+            <input type="button" class="buttonbetter" value="minimal mode" onclick="toggleMinMode()"><br><br>
 
             <input type="text" class="buttonbetter text" placeholder="add preffered language (ABR)" id="preflang">
             <input type="button" class="buttonbetter" value="set"
@@ -99,7 +101,7 @@
                 onclick="document.getElementById('mainCFG').style.display = 'none'; document.getElementById('buttonCFG').style.display = ''; defaultConfig();"
                 value="close & restore to default"><br>
             <input type="button" class="buttonbetter"
-                onclick="document.getElementById('mainCFG').style.display = 'none'; document.getElementById('buttonCFG').style.display = ''; updateConfig(new Config(document.getElementById('pP').value, document.getElementById('uM').value, document.getElementById('pS').value, document.getElementById('fontPX').value))"
+                onclick="document.getElementById('mainCFG').style.display = 'none'; document.getElementById('buttonCFG').style.display = ''; updateConfig(new Config(document.getElementById('pP').value, document.getElementById('uM').value, document.getElementById('pS').value, document.getElementById('fontPX').value, minimalModeState))"
                 value="close & save"><br>
             <input type="button" class="buttonbetter"
                 onclick="document.getElementById('mainCFG').style.display = 'none'; document.getElementById('buttonCFG').style.display = ''"
@@ -130,14 +132,14 @@
                 onclick="document.getElementById('mainCFG2').style.display = 'none'; document.getElementById('buttonCFG2').style.display = '';addCounter()"
                 value="add">
             <input type="button" class="buttonbetter" onclick="clearDivs(); document.location.reload()" value="reset all counters">
-            <input type="button" class="buttonbetter" onclick="getCounterAsLink()" value="get counter as link">
+            <input type="button" class="buttonbetter" onclick="getCounterAsLink()" value="get counter as link"> <input type="button" class="buttonbetter" onclick="getCountersAsCode('full')" value="get all your counters + config as code" id="getAllCountersAsCode-button"> <input type="button" class="buttonbetter" onclick="getCountersAsCode('counters')" value="get all your counters as code" id="getAllCountersAsCode-button-only"> <input type="text" class="buttonbetter text" placeholder="COPY!" id="getAllCountersAsCode-text" style="display: none;">
             <br><br>
 
             <input type="button" class="buttonbetter"
-                onclick="document.getElementById('mainCFG2').style.display = 'none'; document.getElementById('buttonCFG2').style.display = '';addCounter()"
+                onclick="document.getElementById('mainCFG2').style.display = 'none'; document.getElementById('buttonCFG2').style.display = '';addCounter();onAddCounterMenuClosed()"
                 value="add">
             <input type="button" class="buttonbetter"
-                onclick="document.getElementById('mainCFG2').style.display = 'none'; document.getElementById('buttonCFG2').style.display = ''"
+                onclick="document.getElementById('mainCFG2').style.display = 'none'; document.getElementById('buttonCFG2').style.display = '';onAddCounterMenuClosed()"
                 value="close">
         </div>
     </div>
@@ -148,6 +150,7 @@
         loadLangPreffered()
         //update("divMainVacation", "2022", "05", "24", "0", "2021", "8", "1", "0")
         onLoadFinish();
+        setConfigPlaceholder();
     </script>
 </body>
 
