@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counter 2</title>
+    <link rel="stylesheet" href="cyui/cyui.css">
+    <script src="cyui/cyui.js"></script>
+    <script src="counter_core.js"></script>
+    <script src="frontend.js"></script>
+    <script src="main.js"></script>
+    <style>
+        .iText{
+            width: 150px;
+        }
+    </style>
+</head>
+
+<body class="body">
+    <h1 class="h1" id="header">Counter<span style="font-size: small; font-weight: 400;">v2</span></h1>
+    <br id="headerBR">
+    <div id="moreDivs" style="display: inline-block;"></div>
+
+
+    <div style="position: absolute; left: 2px; bottom: 2px;">
+        <input type="button" id="settingsMenuButton" class="buttonbetter" value="settings" onclick='toggleSettingsMenu();'>
+        <div id="settingsMenu" style="display: none;">
+            <span class="cyuitext">profile</span>&nbsp;<select name="profiles" class="buttonbetter" id="profileSelect" onchange='switchToProfile(val("profileSelect"))'></select> <br>
+            <input type="text" class="buttonbetter iText" placeholder="new profile name" id="newProfileName"> <input type="button" id="settingsMenuButton" class="buttonbetter" value="add" onclick='switchToProfile(val("newProfileName"))'> <br>            <br>
+            <br>
+            <input type="text" class="buttonbetter iText" placeholder="Title" id="counter-title"> <br>
+            <span class="cyuitext">repeat</span>&nbsp;<input type="checkbox" id="counter-repeat"/> <br>
+            <span class="cyuitext">start</span>&nbsp;<input type="datetime-local" class="buttonbetter" id="dateStart"> <br>
+            <span class="cyuitext">end</span>&nbsp;&nbsp;<input type="datetime-local" class="buttonbetter" id="dateEnd"> <br>
+            <input type="button" id="settingsMenuButton" class="buttonbetter" value="add counter" onclick='addCounterFromFrontend();'> <br>
+            <br>
+            <input type="button" id="settingsMenuButton" class="buttonbetter" value="close" onclick='toggleSettingsMenu();'>&nbsp;<span class="cyuitext" id="versionString" style="color: rgba(255, 255, 255, 0.1);">version</span>
+        </div>
+    </div>
+
+    <script>
+        initialize();
+        function addCounterFromFrontend(){
+            const newCounter = new Counter(val("counter-title"), null, new Date(val("dateStart")).getTime(), new Date(val("dateEnd")).getTime(), valCheckbox("counter-repeat"));
+            addCounterToArrayAndFrontend(newCounter);
+        }
+    </script>
+</body>
+</html>
