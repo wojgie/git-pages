@@ -8,7 +8,7 @@ let CFG = null;
 let lang = "en"
 let langLocaleString = "en"
 const divMainClassName = "mainFont divMain";
-const scriptVersion = "v1.14";
+const scriptVersion = "v1.15";
 let buttonsToHideInMinMode = ["buttonCFG", "buttonCFG2"]
 
 
@@ -292,7 +292,7 @@ function getCountersAsCode(type){
     if(type == "full"){
         mainConfig = `-${btoa(localStorage.getItem("config"))}`
     }
-    const countersEncoded = `${baseURL}?action=set&type=${type}&code=COUNTER@GITHUB-WOJGIE-${scriptVersion}-${btoa(localStorage.getItem("divs"))}${mainConfig}`
+    const countersEncoded = `${baseURL}?action=set&type=${type}&code=COUNTER@GITHUB_WOJGIE-${scriptVersion}-${btoa(localStorage.getItem("divs"))}${mainConfig}\nYou can also paste this into CounterV2`
     getAllCountersText.style.display = "";
     getAllCountersButton.style.display = "none";
     getAllCountersButtonOnly.style.display = "none";
