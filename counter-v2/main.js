@@ -7,7 +7,7 @@ let lang = "en"
 let profile = "main"
 let langPack = langPacks[lang];
 let configuration = new Configuration(4, 1, "en", false, 100, false, false, "en", {});
-const counterVersion = "2.0_Beta"; //do not use - because if i want to import configuration from v1 it isn't going to be nice
+const counterVersion = "2.01_Beta"; //do not use - because if i want to import configuration from v1 it isn't going to be nice
 
 //these 2 values are going to be overwritten in initialize()
 let configurationSaveKey = "v2_configuration";
@@ -68,6 +68,34 @@ function initialize(){
     addProfilesToSelectionMenu();
     configUpdateLoop();
     setText("versionString", counterVersion);
+    parseURLArguments();
+}
+
+function parseURLArguments(){
+    const urlParams = new URLSearchParams(window.location.search);
+    if(!urlParams.has("action")){
+        return;
+    }
+    const action = urlParams.get("action");
+
+    //don't support old V1 "add" actions. stick to supporting "set"
+    if(action == "add"){
+
+    }
+
+    if(action == "set"){
+        if(!urlParams.has("code"))
+            return;
+        let code = urlParams.get("code");
+        code = code.replace("@GITHUB-", "@GITHUB_"); //this is stupid
+        //code should always start from COUNTER@GITHUB_WOJGIE-[version in clear text]-...
+        const importedVersion = code.split("-")[1];
+        if(importedVersion.startsWith("v1.")){
+            console.log("[parseURLArguments] trying to load old counters")
+            loadOldCountersOrConfigsFromCode(code, importedVersion, urlParams.get("type"), true);
+        }
+
+    }
 }
 
 function loadConfiguration(){
@@ -157,6 +185,7 @@ function Counter(title, divID, startDateMs, endDateMs, shouldRepeat){
 
     
     this.update = async function update(){
+        const startCalcMs = Date.now();
         const counterData = getCounterData(this.startDateMs, this.endDateMs, -1, configuration.decimalPlacesPercentage, configuration.decimalPlacesSeconds, configuration.locale, configuration.hour12);
         let updateMsThisTime = configuration.updateMs;
         let titleThisUpdate = this.title;
@@ -181,6 +210,11 @@ function Counter(title, divID, startDateMs, endDateMs, shouldRepeat){
             ${langPack["counter.percentage"]}: ${counterData.percentageString} <br>
             ${langPack["counter.wWeekends"]}: ${counterData.workDaysLeft} `
 
+        const diffMs = Date.now()-startCalcMs;
+        if(diffMs > 30){
+            console.log(`[counter-main] perf problem at counter \"${this.title}\" main update: ${diffMs}ms`)
+        }
+
         //really ?
         //i mean i get it but really ?
         var jsIsShit = this;
@@ -195,6 +229,8 @@ function Counter(title, divID, startDateMs, endDateMs, shouldRepeat){
         saveCounters();
     }
 }
+
+const isThereACounterWithThisTitle = (title) => counters.some((element) => element.title === title);
 
 let settingsMenuStatus = false;
 function toggleSettingsMenu(){
