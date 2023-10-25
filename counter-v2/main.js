@@ -7,7 +7,7 @@ let lang = "en"
 let profile = "main"
 let langPack = langPacks[lang];
 let configuration = new Configuration(4, 1, "en", false, 100, false, false, "en", {});
-const counterVersion = "2.01_Beta"; //do not use - because if i want to import configuration from v1 it isn't going to be nice
+const counterVersion = "2.02_Beta"; //do not use - because if i want to import configuration from v1 it isn't going to be nice
 
 //these 2 values are going to be overwritten in initialize()
 let configurationSaveKey = "v2_configuration";
@@ -159,7 +159,7 @@ function Configuration(decimalPlacesPercentage, decimalPlacesSeconds, locale, ho
 }
 
 async function configUpdateLoop(){
-    console.log("[Configuration-Loop] updating configuration")
+    console.log("[configuration-loop] updating configuration")
     saveCounters()
     saveConfiguration()
     setTimeout(function () { configUpdateLoop() }, 10000);
@@ -190,12 +190,20 @@ function Counter(title, divID, startDateMs, endDateMs, shouldRepeat){
         let updateMsThisTime = configuration.updateMs;
         let titleThisUpdate = this.title;
 
-        if(counterData.minutesLeft < 0){
-            let diff = this.endDateMs-this.startDateMs;
+        let diff = this.endDateMs-this.startDateMs;
+        if(counterData.minutesLeft < 0 && this.shouldRepeat){
             this.endDateMs += diff;
             this.startDateMs += diff;
             updateMsThisTime = 0;
             titleThisUpdate = "[SYNC]";
+            console.log("[counter-main] sync [+]")
+        }
+        if(counterData.percentageNumber > 100 && this.shouldRepeat){ // we are too early
+            this.endDateMs -= diff;
+            this.startDateMs -= diff;
+            updateMsThisTime = 0;
+            titleThisUpdate = "[SYNC-]";
+            console.log("[counter-main] sync [-]")
         }
 
 
