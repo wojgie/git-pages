@@ -292,7 +292,7 @@ function getCountersAsCode(type){
     if(type == "full"){
         mainConfig = `-${btoa(localStorage.getItem("config"))}`
     }
-    const countersEncoded = `${baseURL}?action=set&type=${type}&code=COUNTER@GITHUB_WOJGIE-${scriptVersion}-${btoa(localStorage.getItem("divs"))}${mainConfig}\nYou can also paste this into CounterV2`
+    const countersEncoded = `${baseURL}?action=set&type=${type}&code=COUNTER@GITHUB_WOJGIE-${scriptVersion}-${btoa(localStorage.getItem("divs"))}${mainConfig}\n\n\nYou can also paste this into CounterV2`
     getAllCountersText.style.display = "";
     getAllCountersButton.style.display = "none";
     getAllCountersButtonOnly.style.display = "none";
