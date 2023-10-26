@@ -7,7 +7,9 @@ let lang = "en"
 let profile = "main"
 let langPack = langPacks[lang];
 let configuration = new Configuration(4, 1, "en", false, 100, false, false, "en", {});
-const counterVersion = "2.02_Beta"; //do not use - because if i want to import configuration from v1 it isn't going to be nice
+const counterVersion = "2.03_Beta"; //do not use - because if i want to import configuration from v1 it isn't going to be nice
+
+const debug_settingsmenu = false;
 
 //these 2 values are going to be overwritten in initialize()
 let configurationSaveKey = "v2_configuration";
@@ -33,6 +35,7 @@ function getProfileList(){
 
 function addProfilesToSelectionMenu(){
     let selectMenu = get("profileSelect");
+    selectMenu.innerHTML = ""
     for(var i of getProfileList()){
         var opt = document.createElement('option');
         opt.value = i;
@@ -60,8 +63,8 @@ function switchToProfile(profileName){
 
 function initialize(){
     loadLastProfileInUse();
-    configurationSaveKey = `${configurationSaveKeyTemplate}_profile_${profile}`;
-    countersSaveKey = `${countersSaveKeyTemplate}_profile_${profile}`;
+    configurationSaveKey = getConfigurationSaveKey(profile);
+    countersSaveKey = getCountersSaveKey(profile);
     loadConfiguration();
     loadCounters();
     saveLastProfileInUse();
@@ -69,6 +72,21 @@ function initialize(){
     configUpdateLoop();
     setText("versionString", counterVersion);
     parseURLArguments();
+    debuggingHelper();
+}
+
+function getConfigurationSaveKey(profileName){
+    return `${configurationSaveKeyTemplate}_profile_${profileName}`;
+}
+
+function getCountersSaveKey(profileName){
+    return `${countersSaveKeyTemplate}_profile_${profileName}`;
+}
+
+function debuggingHelper(){
+    if(debug_settingsmenu){
+        toggleSettingsMenu()
+    }
 }
 
 function parseURLArguments(){
@@ -207,7 +225,7 @@ function Counter(title, divID, startDateMs, endDateMs, shouldRepeat){
         }
 
 
-        document.getElementById(divID).innerHTML = `
+        document.getElementById("span_"+divID).innerHTML = `
             ${titleThisUpdate} <br>
             ${langPack["counter.countTo"]}: ${counterData.formattedDate} <br>
             ${langPack["counter.weeks"]}: ${counterData.weeksLeft} <br>
@@ -228,10 +246,21 @@ function Counter(title, divID, startDateMs, endDateMs, shouldRepeat){
         var jsIsShit = this;
         setTimeout(function () { jsIsShit.update() }, updateMsThisTime);
     }
+
+    this.offsetCounterByMs = function offsetCounterByMs(ms){
+        this.startDateMs += ms;
+        this.endDateMs += ms;
+    }
+
     this.addFrontendAndStart = async function addFrontendAndStart(){
         let div = document.createElement("div");
         div.className = "mainFont divMain"
         div.id = this.divID;
+        div.innerHTML = `<span id="span_${this.divID}"></span><span class="countercontrols" style="display: none;" id="controls_${this.divID}"><br><br>
+            offset by an hour <input type="button" class="cyuibuttoncolordark" value="+" onclick="getCounterByTitleAndOffset('${this.title}', ${1000*60*60})"><input type="button" class="cyuibuttoncolordark" value="-" onclick="getCounterByTitleAndOffset('${this.title}', ${1000*60*60*-1})"> <br>
+            offset by an minute <input type="button" class="cyuibuttoncolordark" value="+" onclick="getCounterByTitleAndOffset('${this.title}', ${1000*60})"><input type="button" class="cyuibuttoncolordark" value="-" onclick="getCounterByTitleAndOffset('${this.title}', ${1000*60*-1})"> <br>
+            <input type="button" class="cyuibuttoncolordark" value="remove" onclick="getCounterByTitleAndRemoveIt('${this.title}')"> <input type="button" class="cyuibuttoncolordark" value="toggle repeat" onclick="getCounterByTitleAndToggleRepeat('${this.title}')"> 
+            </span>`
         document.getElementById("moreDivs").after(div);
         this.update();
         saveCounters();
@@ -239,6 +268,54 @@ function Counter(title, divID, startDateMs, endDateMs, shouldRepeat){
 }
 
 const isThereACounterWithThisTitle = (title) => counters.some((element) => element.title === title);
+const getCounterByTitle = (title) => counters.find(element => element.title === title) || null;
+
+let modMenuOpen = false;
+function toggleCounterEditModMenu(){
+    modMenuOpen = !modMenuOpen;
+    let displayStyle = "";
+    if(!modMenuOpen){
+        displayStyle = "none";
+    }
+    const counterControls = document.querySelectorAll('.countercontrols');
+    for(const element of counterControls){
+        element.style.display = displayStyle;
+    }
+}
+
+function getCounterByTitleAndOffset(title, ms){
+    const cntr = getCounterByTitle(title)
+    if(cntr == null){
+        alert(`${title} not found! (internal error?)`)
+        return
+    }
+    cntr.offsetCounterByMs(ms);
+    console.log(`[counter-edit] counter "${title}" offset by ${ms}`)
+}
+function getCounterByTitleAndToggleRepeat(title){
+    const cntr = getCounterByTitle(title)
+    if(cntr == null){
+        alert(`${title} not found! (internal error?)`)
+        return
+    }
+    cntr.shouldRepeat = !cntr.shouldRepeat;
+    
+    console.log(`[counter-edit] counter "${title}" repeat set to ${cntr.shouldRepeat}`)
+    alert(`Current repeat status: ${cntr.shouldRepeat}`)
+}
+function getCounterByTitleAndRemoveIt(title){
+    const cntr = getCounterByTitle(title)
+    if(cntr == null){
+        alert(`${title} not found! (internal error?)`)
+        return
+    }
+    const index = counters.findIndex(element => element.title === title);
+    counters.splice(index, 1);
+    saveCounters()
+    saveConfiguration()
+    console.log(`[counter-edit] counter "${title}" removed`)
+    location.reload();
+}
 
 let settingsMenuStatus = false;
 function toggleSettingsMenu(){
@@ -280,7 +357,20 @@ function getDatesInRange(startDate, endDate) {
     return dates;
 }
 
-//all todos
+function deleteProfile(profileToDeletion){
+    const configKey = getConfigurationSaveKey(profileToDeletion);
+    const counterKey = getCountersSaveKey(profileToDeletion);
+    localStorage.removeItem(configKey)
+    localStorage.removeItem(counterKey)
+    console.log(`[counter-edit] config: ${configKey} counter: ${counterKey}`)
+    alert("profile deleted")
+    if(profile == profileToDeletion){
+        profile = "main";
+        location.reload();
+    }
+    addProfilesToSelectionMenu();
+}
+
+//todo all todos
 //langPacks and lang stuff
-//counters as a URL
-//reading counters as a url from Counter v1
+//exporting/loading counters as a URL from v2
