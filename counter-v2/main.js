@@ -7,7 +7,7 @@ let lang = "en"
 let profile = "main"
 let langPack = langPacks[lang];
 let configuration = new Configuration(4, 1, "en", false, 100, false, false, "en", {});
-const counterVersion = "2.03_Beta"; //do not use - because if i want to import configuration from v1 it isn't going to be nice
+const counterVersion = "2.04_beta"; //do not use - because if i want to import configuration from v1 it isn't going to be nice
 
 const debug_settingsmenu = false;
 
@@ -110,9 +110,11 @@ function parseURLArguments(){
         const importedVersion = code.split("-")[1];
         if(importedVersion.startsWith("v1.")){
             console.log("[parseURLArguments] trying to load old counters")
-            loadOldCountersOrConfigsFromCode(code, importedVersion, urlParams.get("type"), true);
+            loadOldCountersOrConfigsFromCodeLegacy(code, importedVersion, urlParams.get("type"), true);
+        }else{
+            console.log("[parseURLArguments] trying to load new counters")
+            loadCountersOrConfigsFromCodeLatest(code, importedVersion, urlParams.get("type"), true);
         }
-
     }
 }
 
@@ -192,8 +194,6 @@ function Counter(title, divID, startDateMs, endDateMs, shouldRepeat){
         divID = (Math.random() * 100000) + "_divCounter";
     }
     this.divID = divID;
-    // this.startDateString = new Date(startDateMs).toUTCString();
-    // this.endDateString = new Date(endDateMs).toUTCString();
     this.startDateMs = startDateMs;
     this.endDateMs = endDateMs;
     if(shouldRepeat == null || shouldRepeat === undefined){
@@ -216,13 +216,13 @@ function Counter(title, divID, startDateMs, endDateMs, shouldRepeat){
             titleThisUpdate = "[SYNC]";
             console.log("[counter-main] sync [+]")
         }
-        if(counterData.percentageNumber > 100 && this.shouldRepeat){ // we are too early
-            this.endDateMs -= diff;
-            this.startDateMs -= diff;
-            updateMsThisTime = 0;
-            titleThisUpdate = "[SYNC-]";
-            console.log("[counter-main] sync [-]")
-        }
+        // if(counterData.percentageNumber > 100 && this.shouldRepeat){ // we are too early
+        //     this.endDateMs -= diff;
+        //     this.startDateMs -= diff;
+        //     updateMsThisTime = 0;
+        //     titleThisUpdate = "[SYNC-]";
+        //     console.log("[counter-main] sync [-]")
+        // }
 
 
         document.getElementById("span_"+divID).innerHTML = `
@@ -241,10 +241,8 @@ function Counter(title, divID, startDateMs, endDateMs, shouldRepeat){
             console.log(`[counter-main] perf problem at counter \"${this.title}\" main update: ${diffMs}ms`)
         }
 
-        //really ?
-        //i mean i get it but really ?
-        var jsIsShit = this;
-        setTimeout(function () { jsIsShit.update() }, updateMsThisTime);
+        var literallyThis = this;
+        setTimeout(function () { literallyThis.update() }, updateMsThisTime);
     }
 
     this.offsetCounterByMs = function offsetCounterByMs(ms){

@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="cyui/cyui.css">
     <script src="cyui/cyui.js"></script>
     <script src="counter_core.js"></script>
+    <script src="latestloader.js"></script>
     <script src="legacyloader.js"></script>
     <script src="main.js"></script>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -39,6 +40,7 @@
             <input type="button" class="cyuibutton" value="add counter" onclick='addCounterFromFrontend();'> <br>
             <br>
             <input type="button" class="cyuibutton" value="toggle counter edit menu" onclick='toggleCounterEditModMenu();'><br>
+            <input type="text" class="cyuibutton iText" placeholder="profile name for importers" id="profileNameExport">&nbsp;<input type="button" class="cyuibutton" value="export this profile" onclick='getCounterInstance(val("profileNameExport"));'><br>
             <br>
             <input type="button" class="cyuibutton" value="close" onclick='toggleSettingsMenu();'>&nbsp;<span class="cyuitext" id="versionString" style="color: rgba(255, 255, 255, 0.1);">version</span>
         </div>

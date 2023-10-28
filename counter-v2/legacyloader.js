@@ -5,7 +5,7 @@
 //code should be COUNTER@GITHUB_WOJGIE-[version in clear text]-[COUNTERS IN BASE64]-[CONFIG IN BASE64]
 //configType in counter v1 had 2 options, "full" and "counters"
 //"full" had config data as well
-function loadOldCountersOrConfigsFromCode(code, importedVersion, configType, makeNewProfile){
+function loadOldCountersOrConfigsFromCodeLegacy(code, importedVersion, configType, makeNewProfile){
     if(makeNewProfile){
         const newProfileName = `imported_${importedVersion}`;
         if(profile != newProfileName){
