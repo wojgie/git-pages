@@ -6,8 +6,8 @@ langPacks["en"] = JSON.parse("{\"counter.countTo\":\"counting to\",\"counter.wee
 let lang = "en"
 let profile = "main"
 let langPack = langPacks[lang];
-let configuration = new Configuration(4, 1, "en", false, 100, false, false, "en", {});
-const counterVersion = "2.04_beta"; //do not use - because if i want to import configuration from v1 it isn't going to be nice
+let configuration = new Configuration(4, 1, "en", false, 100, false, false, "en", {}, 100);
+const counterVersion = "2.05_beta"; //do not use - because if i want to import configuration from v1 it isn't going to be nice
 
 const debug_settingsmenu = false;
 
@@ -31,6 +31,19 @@ function getProfileList(){
         }
     }
     return profilesList;
+}
+
+/**
+ * 
+ * @param {*} zoomLevel from 0 to 1 decimal
+ */
+function setZoomOnCounters(zoomLevel){
+    if(zoomLevel >= 96 && zoomLevel <= 104){
+        zoomLevel = 100;
+    }
+    setText("zoomInfo", "zoom: "+zoomLevel+"%")
+    get("containerForCounters").style.zoom = zoomLevel/100;
+    configuration.counterZoomLevel = zoomLevel;
 }
 
 function addProfilesToSelectionMenu(){
@@ -131,6 +144,10 @@ function loadConfiguration(){
 //separate if i will add things in the future 
 function loadConfigurationString(configurationString){
     configuration = JSON.parse(configurationString)
+    if(configuration.counterZoomLevel == undefined){
+        configuration.counterZoomLevel = 100;
+    }
+    setZoomOnCounters(configuration.counterZoomLevel)
 }
 
 function saveConfiguration(){
@@ -166,7 +183,7 @@ function saveCounters(){
 }
 
 
-function Configuration(decimalPlacesPercentage, decimalPlacesSeconds, locale, hour12, updateMs, minimalMode, oled, langConfiguration, langPacksConfiguration){
+function Configuration(decimalPlacesPercentage, decimalPlacesSeconds, locale, hour12, updateMs, minimalMode, oled, langConfiguration, langPacksConfiguration, counterZoomLevel){
     this.decimalPlacesPercentage = decimalPlacesPercentage;
     this.decimalPlacesSeconds = decimalPlacesSeconds;
     this.locale = locale;
@@ -176,6 +193,7 @@ function Configuration(decimalPlacesPercentage, decimalPlacesSeconds, locale, ho
     this.oled = oled;
     this.langConfiguration = langConfiguration;
     this.langPacksConfiguration = langPacksConfiguration;
+    this.counterZoomLevel = counterZoomLevel;
 }
 
 async function configUpdateLoop(){

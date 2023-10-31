@@ -23,8 +23,9 @@
 <body class="body">
     <h1 class="h1" id="header">Counter<span style="font-size: small; font-weight: 400;">v2</span></h1>
     <br id="headerBR">
-    <div id="moreDivs" style="display: inline-block;"></div>
-
+    <div id="containerForCounters" style="zoom: 1;">
+        <div id="moreDivs" style="display: inline-block;"></div>
+    </div>
 
     <div style="position: absolute; left: 2px; bottom: 2px;">
         <span id="settingsMenuButton"><input type="button" class="cyuibutton" value="settings" onclick='toggleSettingsMenu();'>&nbsp;<span class="cyuitext" style="color: rgba(255, 255, 255, 0.1);">Warning! This is beta version. It lacks a lot of features at the moment.</span></span>
@@ -39,6 +40,7 @@
             <span class="cyuitext">end</span>&nbsp;&nbsp;<input type="datetime-local" class="cyuibutton" id="dateEnd"> <br>
             <input type="button" class="cyuibutton" value="add counter" onclick='addCounterFromFrontend();'> <br>
             <br>
+            <input type="range" min="10" max="250" step="1" value="100" style="width: 100px; height: 4px;" oninput='setZoomOnCounters(this.value)'><span class="cyuitext" id="zoomInfo">zoom: 100%</span><br>
             <input type="button" class="cyuibutton" value="toggle counter edit menu" onclick='toggleCounterEditModMenu();'><br>
             <input type="text" class="cyuibutton iText" placeholder="profile name for importers" id="profileNameExport">&nbsp;<input type="button" class="cyuibutton" value="export this profile" onclick='getCounterInstance(val("profileNameExport"));'><br>
             <br>
