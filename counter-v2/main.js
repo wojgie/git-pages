@@ -7,7 +7,7 @@ let lang = "en"
 let profile = "main"
 let langPack = langPacks[lang];
 let configuration = new Configuration(4, 1, "en", false, 100, false, false, "en", {}, 100);
-const counterVersion = "2.05_beta"; //do not use - because if i want to import configuration from v1 it isn't going to be nice
+const counterVersion = "2.06_beta"; //do not use - because if i want to import configuration from v1 it isn't going to be nice
 
 const debug_settingsmenu = false;
 
@@ -388,5 +388,10 @@ function deleteProfile(profileToDeletion){
 }
 
 //todo all todos
-//langPacks and lang stuff
+//langPacks and lang stuff (maybe not? i don't know. i am not missing langpacks)
 //exporting/loading counters as a URL from v2
+//option in configuration to disable "withoutWeekends"
+//instead of SYNC'ing for a long time, incrementing startDate and endDate one by one, just calculate the time difference and do it faster
+
+//one more thing: maybe while exporting replace every key with a shorter version of it? "startDate" -> "sD" ?
+// + add an option to import it without changing anything in the url

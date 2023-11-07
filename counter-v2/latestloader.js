@@ -1,6 +1,6 @@
 ///?action=set&type=full&code=COUNTER@GITHUB_WOJGIE-[version in clear text]-[COUNTERS IN BASE64]-[CONFIG IN BASE64]-[PROFILE IN BASE64]
 function getCounterInstanceAsURLCode(profileName){
-    return `?action=set&type=full&code=COUNTER-${counterVersion}-${btoa(localStorage.getItem(countersSaveKey))}-${btoa(localStorage.getItem(configurationSaveKey))}-${btoa(profileName)}`
+    return `?action=set&type=full&code=COUNTER-${counterVersion}-${btoa(JSON.stringify(counters, jsonReplacer))}-${btoa(localStorage.getItem(configurationSaveKey))}-${btoa(profileName)}`
 }
 
 function loadCountersOrConfigsFromCodeLatest(code, importedVersion, configType, makeNewProfile){
@@ -28,4 +28,11 @@ function loadCountersOrConfigsFromCodeLatest(code, importedVersion, configType, 
 const baseURL = location.protocol + '//' + location.host + location.pathname;
 function getCounterInstance(profileName){
     alert(`${baseURL}${getCounterInstanceAsURLCode(profileName)}`)
+}
+
+function jsonReplacer(key, value)
+{
+    if(key == "divID") return undefined;
+    if(key == "shouldRepeat" && !value) return undefined; //we can omit "shouldRepeat" if its false. it will default to false in the "Counter" constructor.
+    return value;
 }
